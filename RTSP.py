@@ -2,7 +2,7 @@ import cv2
 
 def main():
     # Укажем RTSP-URL с учётом логина и пароля
-    rtsp_url = "rtsp://admin:admin@192.168.0.90/axis-media/media.amp"
+    rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp"
 
     cap = cv2.VideoCapture(rtsp_url)
     if not cap.isOpened():
