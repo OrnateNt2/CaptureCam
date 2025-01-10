@@ -3,25 +3,20 @@ import cv2
 def main():
     rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp"
 
-    cap = cv2.VideoCapture(rtsp_url)
+    cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
+
     if not cap.isOpened():
         print("Не удалось открыть RTSP-поток.")
         return
+
+    cv2.namedWindow("Axis", cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty("Axis", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     while True:
         ret, frame = cap.read()
         if not ret:
             print("Ошибка чтения кадра.")
             break
-
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
-        size = 20  
-        x, y = maxLoc
-        
-        cv2.rectangle(frame, (x - size, y - size), (x + size, y + size),
-                      (0, 0, 255), 2)
 
         cv2.imshow("Axis", frame)
 
