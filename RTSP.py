@@ -5,11 +5,6 @@ import os
 import sys
 
 class CameraReader:
-    """
-    Класс, который в фоновом потоке захватывает кадры с камеры.
-    Чтение и декодирование RTSP-потока происходит в отдельном потоке,
-    а основной поток только отображает уже готовые кадры.
-    """
     def __init__(self, rtsp_url, backend=cv2.CAP_FFMPEG):
         self.rtsp_url = rtsp_url
         self.backend = backend
@@ -27,12 +22,9 @@ class CameraReader:
         self.fps = 0.0
 
     def start(self):
-        """
-        Запуск фонового потока чтения кадров.
-        """
         self.capture = cv2.VideoCapture(self.rtsp_url, self.backend)
         if not self.capture.isOpened():
-            print("Не удалось открыть RTSP-поток.")
+            print("Не удалось открыть RTSP-поток")
             return False
 
         # Читаем информацию о текущих параметрах (если доступно)
@@ -47,9 +39,6 @@ class CameraReader:
         return True
 
     def _update_loop(self):
-        """
-        Фоновый цикл чтения кадров.
-        """
         self.last_time = time.time()
         
         while self.running:
@@ -76,9 +65,6 @@ class CameraReader:
         self.capture.release()
 
     def stop(self):
-        """
-        Остановка чтения и освобождение ресурсов.
-        """
         self.running = False
         if self.thread is not None:
             self.thread.join()
@@ -90,39 +76,30 @@ class CameraReader:
         return self.ret, self.frame
 
     def get_fps(self):
-        """
-        Возвращаем оценку FPS за последнюю секунду (как читает камера).
-        """
         return self.fps
 
 
 def main():
-    # Попытка поднять приоритет процесса (на Linux / Raspberry Pi)
     try:
         if sys.platform.startswith('linux'):
-            # Уменьшаем nice-значение, чтобы повысить приоритет (минимум -20)
-            os.nice(-10)  # -10 - умеренное повышение приоритета
+            os.nice(-10)  
         else:
             print("Изменение приоритета поддерживается только на Linux (по умолчанию).")
     except Exception as e:
         print(f"Не удалось изменить приоритет: {e}")
 
     rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp?compression=0"
-    # Примечание: для Raspberry Pi + GStreamer можно попробовать что-то типа:
     # rtsp_url = "rtspsrc location=rtsp://root:root@192.168.0.90/axis-media/media.amp?compression=0 ! decodebin ! videoconvert ! appsink"
 
-    # Создаём объект фонового чтения
     camera = CameraReader(rtsp_url, backend=cv2.CAP_FFMPEG)
     # Для GStreamer можно попробовать: backend=cv2.CAP_GSTREAMER
 
     if not camera.start():
         return
 
-    # Создаём окно и делаем его полноэкранным
     cv2.namedWindow("Axis", cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty("Axis", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    # Для подсчёта задержки (пример)
     prev_frame_time = time.time()
 
     while True:
@@ -130,21 +107,17 @@ def main():
         current_fps = camera.get_fps()
 
         if ret and frame is not None:
-            # Вычисляем задержку в отображении (примерное время между кадрами)
             current_time = time.time()
             delay_ms = (current_time - prev_frame_time) * 1000.0
             prev_frame_time = current_time
 
-            # Наносим текст статистики на кадр
             stats_text = (
                 f"Camera FPS: {current_fps:.2f} | "
                 f"Display Delay: {delay_ms:.2f} ms"
             )
-            # Рисуем текст в левом верхнем углу
             cv2.putText(frame, stats_text, (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,255,0), 2)
 
-            # Показываем кадр
             cv2.imshow("Axis", frame)
 
         # Нажмите 'q' для выхода
