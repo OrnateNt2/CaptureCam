@@ -2,7 +2,7 @@ import cv2
 import time
 
 def main():
-    rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp?compression=80"
+    rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp?compression=100"
 
     cap = cv2.VideoCapture(rtsp_url)
     if not cap.isOpened():
