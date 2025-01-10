@@ -1,10 +1,10 @@
 import cv2
 
 def main():
-    rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp"
+    rtsp_url = "rtsp://root:root@192.168.0.90/axis-media/media.amp?videocodec=mpeg4&compression=0"
 
     cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
-
+    
     if not cap.isOpened():
         print("Не удалось открыть RTSP-поток.")
         return
