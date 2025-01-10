@@ -2,10 +2,7 @@ import requests
 import cv2
 import numpy as np
 
-def get_snapshot(ip="192.168.0.90", user="admin", password="admin"):
-    """
-    Возвращает кадр (numpy-массив) из JPEG-потока камеры Axis по HTTP.
-    """
+def get_snapshot(ip="192.168.0.90", user="root", password="root"):
     url = f"http://{ip}/axis-cgi/jpg/image.cgi"
 
     resp = requests.get(url, auth=(user, password), timeout=5)
@@ -23,7 +20,7 @@ def main():
         print("Не удалось получить изображение.")
         return
 
-    cv2.imshow("Axis Snapshot", frame)
+    cv2.imshow("Axis", frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
